@@ -37,6 +37,34 @@ app.get('/stream/stop', (req, res) => {
     });
 })
 
+app.get('/ir/on', (req, res) => {
+    exec("gpio mode 7 output && gpio write 7 1", (error, stdout, stderr) => {
+        if (error) {
+            res.send({ 'error': error.message });
+            return;
+        }
+        if (stderr) {
+            res.send({ 'error': stdout.message });
+            return;
+        }
+        res.send({ 'success': 'Ir led on' })
+    });
+})
+app.get('/ir/off', (req, res) => {
+    exec("gpio mode 7 output && gpio write 7 0", (error, stdout, stderr) => {
+        if (error) {
+            res.send({ 'error': error.message });
+            return;
+        }
+        if (stderr) {
+            res.send({ 'error': stdout.message });
+            return;
+        }
+        res.send({ 'success': 'Ir led off' })
+    });
+})
+
+
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`)
 })
