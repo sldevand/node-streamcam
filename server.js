@@ -5,9 +5,6 @@ const port = 3000
 
 app.use(express.static('public'));
 
-app.get('/', (req, res) => {
-    res.send('StreamView')
-})
 
 app.get('/stream/start', (req, res) => {
     exec("sudo systemctl start streamcam ", (error, stdout, stderr) => {
