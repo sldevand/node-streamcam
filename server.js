@@ -66,5 +66,5 @@ app.get('/ir/off', (req, res) => {
 
 
 app.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`)
+    console.log(`Node-streamcam app listening at http://localhost:${port}`)
 })

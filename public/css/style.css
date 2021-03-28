@@ -40,6 +40,13 @@
     display: none;
 }
 
+#ir-buttons-container {
+    position: absolute; 
+    left:10px;
+    bottom:10px;
+    display: none;
+}
+
 .green {
     background-color: #4CAF50;
 }
