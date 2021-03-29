@@ -1,9 +1,9 @@
-const express = require('express')
+const express = require('express');
 var favicon = require('serve-favicon');
 var path = require('path');
 const { exec } = require("child_process");
-const app = express()
-const port = 3000
+const app = express();
+const port = 3000;
 
 app.use(express.static('public'));
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -18,7 +18,7 @@ app.get('/stream/start', (req, res) => {
             res.send({ 'error': stdout.message });
             return;
         }
-        res.send({ 'success': 'Started' })
+        res.send({ 'success': 'Started' });
     });
 })
 
@@ -32,7 +32,7 @@ app.get('/stream/stop', (req, res) => {
             res.send({ 'error': stdout.message });
             return;
         }
-        res.send({ 'success': 'Stopped' })
+        res.send({ 'success': 'Stopped' });
     });
 })
 
@@ -46,7 +46,7 @@ app.get('/ir/on', (req, res) => {
             res.send({ 'error': stdout.message });
             return;
         }
-        res.send({ 'success': 'Ir led on' })
+        res.send({ 'success': 'Ir led on' });
     });
 })
 app.get('/ir/off', (req, res) => {
@@ -59,7 +59,7 @@ app.get('/ir/off', (req, res) => {
             res.send({ 'error': stdout.message });
             return;
         }
-        res.send({ 'success': 'Ir led off' })
+        res.send({ 'success': 'Ir led off' });
     });
 })
 
