@@ -4,8 +4,8 @@ An express Nodejs server with UI to stream a webcam from a Raspberry Pi Zero W (
 
 ## Prerequisites
 
-### Mjpeg-streamer
-See installation instructions here -> [GitHub - jacksonliam/mjpg-streamer](https://github.com/jacksonliam/mjpg-streamer).
+### Mjpg-streamer
+See the [documentation](docs/Mjpg-streamer.md)
 
 ### Wiring Pi (optional)
 Optional if you want to control the IR leds.  
@@ -19,9 +19,9 @@ cd node-streamcam
 npm install
 ```
 ## Usage
-
+TODO
 ## Made with
-
+TODO
 
 ## Authors
 [Sébastien Lorrain](https://github.com/sldevand)

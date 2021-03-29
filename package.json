@@ -1,7 +1,7 @@
 {
   "name": "node-streamcam",
   "version": "1.0.0",
-  "description": "",
+  "description": "An express Nodejs server with UI to stream a webcam from a Raspberry Pi Zero W (or WH)",
   "main": "server.js",
   "author": "sldevand (https://github.com/sldevand/node-streamcam)",
   "license": "MIT",
