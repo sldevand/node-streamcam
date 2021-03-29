@@ -1,10 +1,12 @@
 const express = require('express')
+var favicon = require('serve-favicon');
+var path = require('path');
 const { exec } = require("child_process");
 const app = express()
 const port = 3000
 
 app.use(express.static('public'));
-
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 
 app.get('/stream/start', (req, res) => {
     exec("sudo systemctl start streamcam ", (error, stdout, stderr) => {
