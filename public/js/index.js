@@ -65,6 +65,12 @@
 
     function measureCpuTemp() {
         fetchText("/measure/temp", "--").then(function (text) {
+            // Reformat text from stdout
+            if (text.includes('temp=')) {
+                var splitTemp = text.split('=')[1];
+                text = splitTemp.substring(0, splitTemp.length - 2);
+            }
+
             cpuTemp.innerText = text + " °C";
         });
     }
