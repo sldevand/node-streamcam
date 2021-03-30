@@ -34,7 +34,7 @@
   transition: opacity 0.2s ease-in-out;
 }
 
-.buttons-container {
+.display-container {
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -50,6 +50,14 @@
   bottom: 10px;
   display: none;
   z-index: 100;
+}
+
+#cpu-temp {
+  color: rgb(255, 249, 249);
+  font-size: 1.2em;
+  position: fixed;
+  left: 10px;
+  top: 10px;
 }
 
 .green {

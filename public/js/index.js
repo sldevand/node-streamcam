@@ -1,105 +1,115 @@
-var startButton = document.getElementById("start");
-var stopButton = document.getElementById("stop");
-var container = document.getElementById("container");
-var streamButtonsContainer = document.getElementById(
-    "stream-buttons-container"
-);
-var onButton = document.getElementById("on");
-var offButton = document.getElementById("off");
-var irButtonsContainer = document.getElementById("ir-buttons-container");
-var snackbar = document.getElementById("snackbar");
+(function () {
+    var startButton = document.getElementById("start");
+    var stopButton = document.getElementById("stop");
+    var container = document.getElementById("container");
+    var displayContainers = document.getElementsByClassName(
+        "display-container"
+    );
+    var streamButtonsContainer = document.getElementById(
+        "stream-buttons-container"
+    );
+    var onButton = document.getElementById("on");
+    var offButton = document.getElementById("off");
+    var irButtonsContainer = document.getElementById("ir-buttons-container");
+    var snackbar = document.getElementById("snackbar");
+    var cpuTemp = document.getElementById("cpu-temp");
 
-initStreamButtonsEvents();
-initIrButtonsEvents();
+    initAll();
 
-function initStreamButtonsEvents() {
-    container.addEventListener("click", streamButtonsContainerDisplayToggle);
-    startButton.addEventListener("click", startStream);
-    stopButton.addEventListener("click", stopStream);
-}
-
-function startStream() {
-    fetch("/stream/start")
-        .then(function (response) {
-            return response.json();
-        })
-        .then(function (json) {
-            let text = json.error ? json.error : json.success;
-            showSnackBar(text);
-        });
-}
-
-function stopStream() {
-    fetch("/stream/stop")
-        .then(function (response) {
-            return response.json();
-        })
-        .then(function (json) {
-            let text = json.error ? json.error : json.success;
-            showSnackBar(text);
-        });
-}
-
-function streamButtonsContainerDisplayToggle() {
-    var display;
-    if (
-        !streamButtonsContainer.style.display ||
-        streamButtonsContainer.style.display === "none"
-    ) {
-        display = "block";
-    } else {
-        display = "none";
+    function initAll() {
+        initVideoClickEvent();
+        initStreamButtonsEvents();
+        initIrButtonsEvents();
+        measureCpuTemp();
+        setInterval(measureCpuTemp, 5000);
     }
 
-    streamButtonsContainer.style.display = display;
-}
-
-function initIrButtonsEvents() {
-    container.addEventListener("click", irButtonsContainerDisplayToggle);
-    onButton.addEventListener("click", irOn);
-    offButton.addEventListener("click", irOff);
-}
-
-function irOn() {
-    fetch("/ir/on")
-        .then(function (response) {
-            return response.json();
-        })
-        .then(function (json) {
-            let text = json.error ? json.error : json.success;
-            showSnackBar(text);
+    function initVideoClickEvent() {
+        container.addEventListener("click", () => {
+            Array.prototype.forEach.call(
+                displayContainers,
+                displayContainerToggle
+            );
         });
-}
-
-function irOff() {
-    fetch("/ir/off")
-        .then(function (response) {
-            return response.json();
-        })
-        .then(function (json) {
-            let text = json.error ? json.error : json.success;
-            showSnackBar(text);
-        });
-}
-
-function irButtonsContainerDisplayToggle() {
-    var display;
-    if (
-        !irButtonsContainer.style.display ||
-        irButtonsContainer.style.display === "none"
-    ) {
-        display = "block";
-    } else {
-        display = "none";
     }
 
-    irButtonsContainer.style.display = display;
-}
+    function initStreamButtonsEvents() {
+        startButton.addEventListener("click", startStream);
+        stopButton.addEventListener("click", stopStream);
+    }
 
-function showSnackBar(text) {
-    snackbar.className = "show";
-    snackbar.innerHTML = text;
-    setTimeout(function () {
-        snackbar.className = snackbar.className.replace("show", "");
-    }, 3000);
-}
+    function initIrButtonsEvents() {
+        onButton.addEventListener("click", irOn);
+        offButton.addEventListener("click", irOff);
+    }
+
+    function startStream() {
+        return fetchText("/stream/start").then((textStart) => {
+            return fetchText("/ir/on").then((textOn) => {
+                showSnackBar(textStart + ' and <br>' + textOn);
+            });
+        });
+    }
+
+    function stopStream() {
+        return fetchText("/stream/stop").then((textStop) => {
+            return fetchText("/ir/off").then((textOff) => {
+                showSnackBar(textStop + ' and <br>' + textOff);
+            });
+        });
+    }
+
+    function irOn() {
+        return fetchWithMessage("/ir/on");
+    }
+
+    function irOff() {
+        return fetchWithMessage("/ir/off");
+    }
+
+    function measureCpuTemp() {
+        fetchText("/measure/temp", "--").then(function (text) {
+            cpuTemp.innerText = text + ' °C';
+        });
+    }
+
+    function displayContainerToggle(container) {
+        var display;
+        if (!container.style.display || container.style.display === "none") {
+            display = "block";
+        } else {
+            display = "none";
+        }
+
+        container.style.display = display;
+    }
+
+    function fetchJson(endpoint) {
+        return fetch(endpoint).then(function (response) {
+            return response.json();
+        });
+    }
+
+    function fetchText(endpoint, errorMessage) {
+        return fetchJson(endpoint).then(function (json) {
+            if (errorMessage) {
+                json.error = errorMessage;
+            }
+            return json.error ? json.error : json.success;
+        });
+    }
+
+    function fetchWithMessage(endpoint) {
+        return fetchText(endpoint).then(function (text) {
+            showSnackBar(text);
+        });
+    }
+
+    function showSnackBar(text) {
+        snackbar.className = "show";
+        snackbar.innerHTML = text;
+        setTimeout(function () {
+            snackbar.className = snackbar.className.replace("show", "");
+        }, 3000);
+    }
+})();
