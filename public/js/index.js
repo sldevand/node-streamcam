@@ -70,8 +70,7 @@
                 var splitTemp = text.split('=')[1];
                 text = splitTemp.substring(0, splitTemp.length - 2);
             }
-
-            cpuTemp.innerText = 'Cpu =' + text + ' °C';
+            cpuTemp.innerText = 'Cpu=' + text + ' °C';
         });
     }
 
