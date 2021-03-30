@@ -5,12 +5,8 @@
     var displayContainers = document.getElementsByClassName(
         "display-container"
     );
-    var streamButtonsContainer = document.getElementById(
-        "stream-buttons-container"
-    );
     var onButton = document.getElementById("on");
     var offButton = document.getElementById("off");
-    var irButtonsContainer = document.getElementById("ir-buttons-container");
     var snackbar = document.getElementById("snackbar");
     var cpuTemp = document.getElementById("cpu-temp");
 
@@ -46,7 +42,7 @@
     function startStream() {
         return fetchText("/stream/start").then((textStart) => {
             return fetchText("/ir/on").then((textOn) => {
-                showSnackBar(textStart + ' and <br>' + textOn);
+                showSnackBar(textStart + " and <br>" + textOn);
             });
         });
     }
@@ -54,7 +50,7 @@
     function stopStream() {
         return fetchText("/stream/stop").then((textStop) => {
             return fetchText("/ir/off").then((textOff) => {
-                showSnackBar(textStop + ' and <br>' + textOff);
+                showSnackBar(textStop + " and <br>" + textOff);
             });
         });
     }
@@ -69,7 +65,7 @@
 
     function measureCpuTemp() {
         fetchText("/measure/temp", "--").then(function (text) {
-            cpuTemp.innerText = text + ' °C';
+            cpuTemp.innerText = text + " °C";
         });
     }
 
@@ -95,7 +91,7 @@
             if (errorMessage) {
                 json.error = errorMessage;
             }
-            return json.error ? json.error : json.success;
+            return json.success ? json.success : json.error;
         });
     }
 
