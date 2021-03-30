@@ -54,7 +54,7 @@
 
 #cpu-temp {
   color: rgb(255, 249, 249);
-  font-size: 1.2em;
+  font-size: 1em;
   position: fixed;
   left: 10px;
   top: 10px;

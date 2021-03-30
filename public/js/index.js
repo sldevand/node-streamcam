@@ -71,7 +71,7 @@
                 text = splitTemp.substring(0, splitTemp.length - 2);
             }
 
-            cpuTemp.innerText = text + " °C";
+            cpuTemp.innerText = 'Cpu =' text + ' °C';
         });
     }
 
