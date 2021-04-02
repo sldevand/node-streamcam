@@ -6,7 +6,9 @@
   "author": "sldevand (https://github.com/sldevand/node-streamcam)",
   "license": "MIT",
   "dependencies": {
+    "config": "^3.3.6",
     "express": "^4.17.1",
+    "node-fetch": "^2.6.1",
     "serve-favicon": "^2.5.0"
   }
 }
