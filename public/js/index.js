@@ -9,6 +9,8 @@
     var offButton = document.getElementById("off");
     var snackbar = document.getElementById("snackbar");
     var cpuTemp = document.getElementById("cpu-temp");
+    var videoElement = document.getElementById("videoElement");
+    var src = 'http://192.168.1.94:8080?action=stream'
     var extraMeasuresContainer = document.getElementById("extra-measures-container");
 
     initAll();
@@ -47,6 +49,7 @@
         return fetchText("/stream/start").then((textStart) => {
             return fetchText("/ir/on").then((textOn) => {
                 showSnackBar(textStart + " and <br>" + textOn);
+                refreshImage();
             });
         });
     }
@@ -131,5 +134,11 @@
         setTimeout(function () {
             snackbar.className = snackbar.className.replace("show", "");
         }, 3000);
+    }
+
+    function refreshImage() {
+        var timestamp = new Date().getTime();
+        var queryString = "?t=" + timestamp;
+        videoElement.src = src + queryString;
     }
 })();
