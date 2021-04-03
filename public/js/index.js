@@ -58,6 +58,7 @@
         return fetchText("/stream/stop").then((textStop) => {
             return fetchText("/ir/off").then((textOff) => {
                 showSnackBar(textStop + " and <br>" + textOff);
+                refreshImage();
             });
         });
     }
