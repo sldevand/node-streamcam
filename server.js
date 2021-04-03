@@ -84,13 +84,11 @@ function manageError(res, error, stdout, stderr) {
 }
 
 function findUrl(extraUrls, type) {
-    return Object.entries(extraUrls)
-        .map(([key, value]) => {
-            if (key === type) {
-                return value;
-            }
-        })
-        .join();
+    if (extraUrls.hasOwnProperty(type)) {
+        return extraUrls[type];
+    }
+
+    return null;
 }
 
 function fetchJson(endpoint) {

@@ -53,11 +53,19 @@
 }
 
 #cpu-temp {
+  top: 10px;
+}
+
+.measures {
   color: rgb(255, 249, 249);
   font-size: 1em;
   position: fixed;
-  left: 10px;
   top: 10px;
+  left: 10px;
+}
+
+#extra-measures-container {
+  top: 30px;
 }
 
 .green {

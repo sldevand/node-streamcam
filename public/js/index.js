@@ -9,6 +9,7 @@
     var offButton = document.getElementById("off");
     var snackbar = document.getElementById("snackbar");
     var cpuTemp = document.getElementById("cpu-temp");
+    var extraMeasuresContainer = document.getElementById("extra-measures-container");
 
     initAll();
 
@@ -18,6 +19,9 @@
         initIrButtonsEvents();
         measureCpuTemp();
         setInterval(measureCpuTemp, 5000);
+        let extraMeasureType = 'confortmetre';
+        measureExtra(extraMeasureType);
+        setInterval(() => measureExtra(extraMeasureType), 120000);
     }
 
     function initVideoClickEvent() {
@@ -71,6 +75,21 @@
                 text = splitTemp.substring(0, splitTemp.length - 2);
             }
             cpuTemp.innerText = 'Cpu=' + text + ' °C';
+        });
+    }
+
+    function measureExtra(endpoint) {
+        fetchJson(`/measure/extra/${endpoint}`, "--").then(function (json) {
+            if (json.error) {
+                extraMeasuresContainer.innerHTML = `<span>${endpoint} = -- °C | -- %</span>`;
+                return;
+            }
+
+            let sensor = json.success;
+            if (Array.isArray(sensor) && sensor.length > 0) {
+                sensor = sensor[0];
+            }
+            extraMeasuresContainer.innerHTML = `<span>${endpoint} = ${sensor.valeur1 || '--'} °C | ${sensor.valeur2 || '--'} %</span>`;
         });
     }
 
