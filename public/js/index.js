@@ -138,8 +138,10 @@
     }
 
     function refreshImage() {
-        var timestamp = new Date().getTime();
-        var queryString = "?t=" + timestamp;
-        videoElement.src = src + queryString;
+        setTimeout(() => {
+            var timestamp = new Date().getTime();
+            var queryString = "?t=" + timestamp;
+            videoElement.src = src + queryString;
+        }, 500);
     }
 })();

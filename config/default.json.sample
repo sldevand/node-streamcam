@@ -3,5 +3,11 @@
         "port": 3000
     },
     "ExtraUrls" : {
+    },
+    "Ir": {
+        "hours": {
+            "start": "20:00",
+            "stop": "09:00"
+        }
     }
 }
