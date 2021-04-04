@@ -43,6 +43,8 @@
   bottom: 10px;
   display: none;
   z-index: 150;
+  max-width: max-content;
+  max-height: max-content;
 }
 
 #ir-buttons-container {
@@ -59,10 +61,10 @@
 .measures {
   color: rgb(255, 249, 249);
   font-size: 1em;
-  position: fixed;
   top: 10px;
   left: 10px;
   z-index: 10;
+  max-height: 0px;
 }
 
 #extra-measures-container {
