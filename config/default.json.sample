@@ -9,5 +9,18 @@
             "start": "20:00",
             "stop": "09:00"
         }
+    },
+    "Commands": {
+        "ir": {
+            "on"  : "",
+            "off" : ""
+        },
+        "stream":{
+            "start"  : "",
+            "stop" : ""
+        },
+        "measure":{
+            "cpu_temp" : ""
+        }
     }
 }

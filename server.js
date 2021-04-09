@@ -1,34 +1,42 @@
+//CONFIG
 const config = require("config");
 const serverConfig = config.get("Server");
 const extraUrls = config.get("ExtraUrls");
-const fetch = require("node-fetch");
-const express = require("express");
-var favicon = require("serve-favicon");
-var path = require("path");
+const commands = config.get("Commands");
+
+//SYSTEM
 const { exec } = require("child_process");
+const path = require("path");
+
+//NETWORK
+const fetch = require("node-fetch");
+const favicon = require("serve-favicon");
+const express = require("express");
 const app = express();
 
+//MIDDLEWARES
 app.use(express.static("public"));
 app.use(favicon(path.join(__dirname, "public", "favicon.ico")));
 
+//ROUTES
 app.get("/stream/start", (req, res) => {
-    execWithMessage(res, "sudo systemctl start streamcam", "Started");
+    execWithMessage(res, commands.stream.start, "Started");
 });
 
 app.get("/stream/stop", (req, res) => {
-    execWithMessage(res, "sudo systemctl stop streamcam", "Stopped");
+    execWithMessage(res, commands.stream.stop, "Stopped");
 });
 
 app.get("/ir/on", (req, res) => {
-    execWithMessage(res, "gpio mode 7 output && gpio write 7 1", "Ir led on");
+    execWithMessage(res, commands.ir.on, "Ir led on");
 });
 
 app.get("/ir/off", (req, res) => {
-    execWithMessage(res, "gpio mode 7 output && gpio write 7 0", "Ir led off");
+    execWithMessage(res, commands.ir.off, "Ir led off");
 });
 
 app.get("/measure/temp", (req, res) => {
-    execWithMessage(res, "vcgencmd measure_temp");
+    execWithMessage(res,  commands.measure.cpu_temp);
 });
 
 app.get("/measure/extra/:type", (req, res) => {
@@ -48,12 +56,14 @@ app.get("/measure/extra/:type", (req, res) => {
     return res.send({ error: "No  measure urls found" });
 });
 
+// LISTEN
 app.listen(serverConfig.port, () => {
     console.log(
         `Node-streamcam app listening at http://localhost:${serverConfig.port}`
     );
 });
 
+// MISC FUNCTIONS
 function execWithMessage(res, command, defaultSuccessMsg) {
     exec(command, (error, stdout, stderr) => {
         if (manageError(res, error, stdout, stderr)) {
