@@ -46,20 +46,16 @@
     }
 
     function startStream() {
-        return fetchText("/stream/start").then((textStart) => {
-            return fetchText("/ir/on").then((textOn) => {
-                showSnackBar(textStart + " and <br>" + textOn);
-                refreshImage();
-            });
+        return fetchText("/stream/start").then((text) => {            
+            refreshImage();
+            showSnackBar(text);
         });
     }
 
     function stopStream() {
-        return fetchText("/stream/stop").then((textStop) => {
-            return fetchText("/ir/off").then((textOff) => {
-                showSnackBar(textStop + " and <br>" + textOff);
-                refreshImage();
-            });
+        return fetchText("/stream/stop").then((text) => {
+            refreshImage();
+            showSnackBar(text);
         });
     }
 

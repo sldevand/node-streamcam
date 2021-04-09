@@ -5,8 +5,9 @@ const extraUrls = config.get("ExtraUrls");
 const commands = config.get("Commands");
 
 //SYSTEM
-const { exec } = require("child_process");
 const path = require("path");
+const util = require("util");
+const exec = util.promisify(require("child_process").exec);
 
 //NETWORK
 const fetch = require("node-fetch");
@@ -19,12 +20,30 @@ app.use(express.static("public"));
 app.use(favicon(path.join(__dirname, "public", "favicon.ico")));
 
 //ROUTES
-app.get("/stream/start", (req, res) => {
-    execWithMessage(res, commands.stream.start, "Started");
+app.get("/stream/start", async (req, res) => {
+    try {
+        let successMessage  = await execCommand(commands.stream.start, "Stream started");
+        let successMessage2 = await execCommand(commands.ir.on, "Ir led on");
+        if (successMessage2) {
+            successMessage += " and " + successMessage2;
+        }
+
+        res.send({ success: successMessage });
+    } catch (exception) {
+        res.send({ error: exception.message });
+    }
 });
 
-app.get("/stream/stop", (req, res) => {
-    execWithMessage(res, commands.stream.stop, "Stopped");
+app.get("/stream/stop", async (req, res) => {
+    try {
+        let successMessage  = await execCommand(commands.stream.stop,"Stream stopped");
+        let successMessage2 = await execCommand(commands.ir.off, "Ir led off");
+        successMessage += " and " + successMessage2;
+
+        res.send({ success: successMessage });
+    } catch (exception) {
+        res.send({ error: exception.message });
+    }
 });
 
 app.get("/ir/on", (req, res) => {
@@ -36,7 +55,7 @@ app.get("/ir/off", (req, res) => {
 });
 
 app.get("/measure/temp", (req, res) => {
-    execWithMessage(res,  commands.measure.cpu_temp);
+    execWithMessage(res, commands.measure.cpu_temp);
 });
 
 app.get("/measure/extra/:type", (req, res) => {
@@ -78,6 +97,23 @@ function execWithMessage(res, command, defaultSuccessMsg) {
 
         res.send({ success: successMessage });
     });
+}
+
+async function execCommand(command, defaultSuccessMsg) {
+    try {
+        const { stdout, stderr } = await exec(command);
+        if (stderr) {
+            throw new Error(stderr.message);
+        }
+
+        let successMessage = !defaultSuccessMsg && stdout 
+            ? stdout.trim() 
+            : defaultSuccessMsg;
+
+        return successMessage;
+    } catch (error) {
+        return error.message;
+    }
 }
 
 function manageError(res, error, stdout, stderr) {
