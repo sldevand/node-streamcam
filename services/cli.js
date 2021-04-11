@@ -1,10 +1,10 @@
 const util = require("util");
 const exec = util.promisify(require("child_process").exec);
 
-const command = {
-    execWithMessage: function (res, command, defaultSuccessMsg) {
+const cli = {
+    execWithMessage: (res, command, defaultSuccessMsg) => {
         exec(command, (error, stdout, stderr) => {
-            if (this.manageError(res, error, stdout, stderr)) {
+            if (cli.manageError(res, error, stdout, stderr)) {
                 return;
             }
             let successMessage = "";
@@ -17,7 +17,7 @@ const command = {
             res.send({ success: successMessage });
         });
     },
-    execCommand: async function (command, defaultSuccessMsg) {
+    execCommand: async (command, defaultSuccessMsg) => {
         try {
             const { stdout, stderr } = await exec(command);
             if (stderr) {
@@ -33,7 +33,7 @@ const command = {
             return error.message;
         }
     },
-    manageError: function (res, error, stdout, stderr) {
+    manageError: (res, error, stdout, stderr) => {
         if (error) {
             res.send({ error: error.message });
             return true;
@@ -47,4 +47,4 @@ const command = {
     }
 }
 
-module.exports = command;
+module.exports = cli;

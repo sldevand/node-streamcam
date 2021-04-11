@@ -1,13 +1,13 @@
 const fetch = require("node-fetch");
 
 const request = {
-    fetchJson: function(endpoint) {
+    fetchJson: (endpoint) => {
         return fetch(endpoint).then((response) => {
             return response.json();
         });
     },
-    forwardJson(endpoint, res) {
-        return this.fetchJson(endpoint)
+    forwardJson: (endpoint, res) => {
+        return request.fetchJson(endpoint)
             .then((json) => {
                 return res.send({ success: json });
             })

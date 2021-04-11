@@ -2,14 +2,16 @@
 const config = require("config");
 const serverConfig = config.get("Server");
 const extraUrls = config.get("ExtraUrls");
-const commands = config.get("Commands");
+const commandsConfig = config.get("Commands");
 
 //UTILS
 const utils = require("./helper/utils");
 
 //SYSTEM
 const path = require("path");
-const command = require("./services/command.js");
+const cli = require("./services/cli.js");
+const commands = require("./services/commands.js");
+commands.init(cli, commandsConfig);
 
 //NETWORK
 const request = require("./services/request.js");
@@ -22,42 +24,16 @@ app.use(express.static("public"));
 app.use(favicon(path.join(__dirname, "public", "favicon.ico")));
 
 //ROUTES
-app.get("/stream/start", async (req, res) => {
-    try {
-        let successMessage  = await command.execCommand(commands.stream.start, "Stream started");
-        let successMessage2 = await command.execCommand(commands.ir.on, "Ir led on");
-        if (successMessage2) {
-            successMessage += " and " + successMessage2;
-        }
-
-        res.send({ success: successMessage });
-    } catch (exception) {
-        res.send({ error: exception.message });
-    }
+app.get("/stream/:action", async (req, res) => {
+    commands.execStream(res, req.params.action);
 });
 
-app.get("/stream/stop", async (req, res) => {
-    try {
-        let successMessage  = await command.execCommand(commands.stream.stop,"Stream stopped");
-        let successMessage2 = await command.execCommand(commands.ir.off, "Ir led off");
-        successMessage += " and " + successMessage2;
-
-        res.send({ success: successMessage });
-    } catch (exception) {
-        res.send({ error: exception.message });
-    }
-});
-
-app.get("/ir/on", (req, res) => {
-    command.execWithMessage(res, commands.ir.on, "Ir led on");
-});
-
-app.get("/ir/off", (req, res) => {
-    command.execWithMessage(res, commands.ir.off, "Ir led off");
+app.get("/ir/:action", (req, res) => {
+    commands.execIrWithMessage(res, req.params.action);
 });
 
 app.get("/measure/temp", (req, res) => {
-    command.execWithMessage(res, commands.measure.cpu_temp);
+    commands.execCpuTemp(res);
 });
 
 app.get("/measure/extra/:type", (req, res) => {
