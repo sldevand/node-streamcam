@@ -9,7 +9,7 @@ const commands = {
         }
 
         try {
-            let successMessage = await commands.cli.execCommand(commands.config.stream.start, `Stream ${action}`);
+            let successMessage = await commands.cli.execCommand(commands.config.stream[action], `Stream ${action}`);
             let irAction = action === 'start' ? 'on' : 'off';
             let successMessage2 = await commands.execIr(irAction);
             if (successMessage2) {
