@@ -4,6 +4,9 @@ const serverConfig = config.get("Server");
 const extraUrls = config.get("ExtraUrls");
 const commands = config.get("Commands");
 
+//UTILS
+const utils = require("./helper/utils");
+
 //SYSTEM
 const path = require("path");
 const command = require("./services/command.js");
@@ -66,7 +69,7 @@ app.get("/measure/extra/:type", (req, res) => {
 
     let type = req.params.type;
 
-    if ((foundUrl = findUrl(extraUrls, type))) {
+    if ((foundUrl = utils.findUrl(extraUrls, type))) {
         request.forwardJson(foundUrl, res);
         return;
     }
@@ -80,14 +83,3 @@ app.listen(serverConfig.port, () => {
         `Node-streamcam app listening at http://localhost:${serverConfig.port}`
     );
 });
-
-// MISC FUNCTIONS
-
-
-function findUrl(extraUrls, type) {
-    if (extraUrls.hasOwnProperty(type)) {
-        return extraUrls[type];
-    }
-
-    return null;
-}
