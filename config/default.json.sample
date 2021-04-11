@@ -4,10 +4,10 @@
     },
     "ExtraUrls" : {
     },
-    "Ir": {
+    "IrRestrict": {
         "hours": {
-            "start": "20:00",
-            "stop": "09:00"
+            "start": "09:00",
+            "stop": "20:00"
         }
     },
     "Commands": {

@@ -3,6 +3,7 @@ const config = require("config");
 const serverConfig = config.get("Server");
 const extraUrls = config.get("ExtraUrls");
 const commandsConfig = config.get("Commands");
+const irRestrictConfig = config.get("IrRestrict");
 
 //UTILS
 const utils = require("./helper/utils");
@@ -11,7 +12,7 @@ const utils = require("./helper/utils");
 const path = require("path");
 const cli = require("./services/cli.js");
 const commands = require("./services/commands.js");
-commands.init(cli, commandsConfig);
+commands.init(cli, commandsConfig, irRestrictConfig);
 
 //NETWORK
 const request = require("./services/request.js");
