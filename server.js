@@ -6,8 +6,7 @@ const commands = config.get("Commands");
 
 //SYSTEM
 const path = require("path");
-const util = require("util");
-const exec = util.promisify(require("child_process").exec);
+const command = require("./services/command.js");
 
 //NETWORK
 const request = require("./services/request.js");
@@ -22,8 +21,8 @@ app.use(favicon(path.join(__dirname, "public", "favicon.ico")));
 //ROUTES
 app.get("/stream/start", async (req, res) => {
     try {
-        let successMessage  = await execCommand(commands.stream.start, "Stream started");
-        let successMessage2 = await execCommand(commands.ir.on, "Ir led on");
+        let successMessage  = await command.execCommand(commands.stream.start, "Stream started");
+        let successMessage2 = await command.execCommand(commands.ir.on, "Ir led on");
         if (successMessage2) {
             successMessage += " and " + successMessage2;
         }
@@ -36,8 +35,8 @@ app.get("/stream/start", async (req, res) => {
 
 app.get("/stream/stop", async (req, res) => {
     try {
-        let successMessage  = await execCommand(commands.stream.stop,"Stream stopped");
-        let successMessage2 = await execCommand(commands.ir.off, "Ir led off");
+        let successMessage  = await command.execCommand(commands.stream.stop,"Stream stopped");
+        let successMessage2 = await command.execCommand(commands.ir.off, "Ir led off");
         successMessage += " and " + successMessage2;
 
         res.send({ success: successMessage });
@@ -47,15 +46,15 @@ app.get("/stream/stop", async (req, res) => {
 });
 
 app.get("/ir/on", (req, res) => {
-    execWithMessage(res, commands.ir.on, "Ir led on");
+    command.execWithMessage(res, commands.ir.on, "Ir led on");
 });
 
 app.get("/ir/off", (req, res) => {
-    execWithMessage(res, commands.ir.off, "Ir led off");
+    command.execWithMessage(res, commands.ir.off, "Ir led off");
 });
 
 app.get("/measure/temp", (req, res) => {
-    execWithMessage(res, commands.measure.cpu_temp);
+    command.execWithMessage(res, commands.measure.cpu_temp);
 });
 
 app.get("/measure/extra/:type", (req, res) => {
@@ -83,51 +82,7 @@ app.listen(serverConfig.port, () => {
 });
 
 // MISC FUNCTIONS
-function execWithMessage(res, command, defaultSuccessMsg) {
-    exec(command, (error, stdout, stderr) => {
-        if (manageError(res, error, stdout, stderr)) {
-            return;
-        }
-        let successMessage = "";
-        if (!successMessage && stdout) {
-            successMessage = stdout.trim();
-        } else {
-            successMessage = defaultSuccessMsg;
-        }
 
-        res.send({ success: successMessage });
-    });
-}
-
-async function execCommand(command, defaultSuccessMsg) {
-    try {
-        const { stdout, stderr } = await exec(command);
-        if (stderr) {
-            throw new Error(stderr.message);
-        }
-
-        let successMessage = !defaultSuccessMsg && stdout 
-            ? stdout.trim() 
-            : defaultSuccessMsg;
-
-        return successMessage;
-    } catch (error) {
-        return error.message;
-    }
-}
-
-function manageError(res, error, stdout, stderr) {
-    if (error) {
-        res.send({ error: error.message });
-        return true;
-    }
-    if (stderr) {
-        res.send({ error: stdout.message });
-        return true;
-    }
-
-    return false;
-}
 
 function findUrl(extraUrls, type) {
     if (extraUrls.hasOwnProperty(type)) {
