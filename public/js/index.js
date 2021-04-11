@@ -10,7 +10,7 @@
     var snackbar = document.getElementById("snackbar");
     var cpuTemp = document.getElementById("cpu-temp");
     var videoElement = document.getElementById("videoElement");
-    var src = 'http://192.168.1.94:8080?action=stream'
+    var src = videoElement.src;
     var extraMeasuresContainer = document.getElementById("extra-measures-container");
 
     initAll();
@@ -137,6 +137,7 @@
         setTimeout(() => {
             var timestamp = new Date().getTime();
             var queryString = "?t=" + timestamp;
+
             videoElement.src = src + queryString;
         }, 500);
     }
