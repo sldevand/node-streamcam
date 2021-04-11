@@ -10,7 +10,7 @@ const util = require("util");
 const exec = util.promisify(require("child_process").exec);
 
 //NETWORK
-const fetch = require("node-fetch");
+const request = require("./services/request.js");
 const favicon = require("serve-favicon");
 const express = require("express");
 const app = express();
@@ -68,7 +68,7 @@ app.get("/measure/extra/:type", (req, res) => {
     let type = req.params.type;
 
     if ((foundUrl = findUrl(extraUrls, type))) {
-        forwardJson(foundUrl, res);
+        request.forwardJson(foundUrl, res);
         return;
     }
 
@@ -135,20 +135,4 @@ function findUrl(extraUrls, type) {
     }
 
     return null;
-}
-
-function fetchJson(endpoint) {
-    return fetch(endpoint).then((response) => {
-        return response.json();
-    });
-}
-
-function forwardJson(endpoint, res) {
-    return fetchJson(endpoint)
-        .then((json) => {
-            return res.send({ success: json });
-        })
-        .catch((err) => {
-            return res.send({ error: err });
-        });
 }
