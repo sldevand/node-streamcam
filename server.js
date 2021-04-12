@@ -1,6 +1,7 @@
 //CONFIG
 const config = require("config");
 const serverConfig = config.get("Server");
+const socketioConfig = config.get("Socketio");
 const extraUrls = config.get("ExtraUrls");
 const commandsConfig = config.get("Commands");
 const irRestrictConfig = config.get("IrRestrict");
@@ -19,9 +20,17 @@ const request = require("./services/request.js");
 const favicon = require("serve-favicon");
 const express = require("express");
 const app = express();
+const http = require("http");
+const server = http.createServer(app);
+const io = require("socket.io")(server,{
+    cors: {
+      origin: "*"
+    }
+  });
 
 //MIDDLEWARES
 app.use(express.static("public"));
+app.use(express.static("node_modules/socket.io/client-dist"));
 app.use(favicon(path.join(__dirname, "public", "favicon.ico")));
 
 //ROUTES
@@ -57,6 +66,14 @@ app.get("/measure/extra/:type", (req, res) => {
 // LISTEN
 app.listen(serverConfig.port, () => {
     console.log(
-        `Node-streamcam app listening at http://localhost:${serverConfig.port}`
+        `Node-streamcam app listening on port ${serverConfig.port}`
     );
+});
+
+io.on("connection", (socket) => {
+    console.log("a user connected");
+});
+
+server.listen(socketioConfig.port, () => {
+    console.log(`socketio listening listening on port ${socketioConfig.port}`);
 });

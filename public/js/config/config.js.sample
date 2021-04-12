@@ -1,0 +1,10 @@
+var config = {
+    "stream": {
+        "port": 3000,
+        "baseUrl": "http://localhost" 
+    },
+    "socketio" : {
+        "port": 3001,
+        "baseUrl": "ws://localhost"    
+    }
+}

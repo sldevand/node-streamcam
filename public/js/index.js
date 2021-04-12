@@ -15,6 +15,10 @@
 
     initAll();
 
+    socket.on("connect", () => {
+        console.log(socket.id);
+    });
+
     function initAll() {
         initVideoClickEvent();
         initStreamButtonsEvents();

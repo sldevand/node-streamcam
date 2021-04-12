@@ -2,6 +2,9 @@
     "Server": {
         "port": 3000
     },
+    "Socketio": {
+        "port": 3001
+    }
     "ExtraUrls" : {
     },
     "IrRestrict": {

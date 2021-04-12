@@ -7,7 +7,7 @@
     <title>BabyCam</title>
     <link rel="shortcut icon" href="favicon.ico">
     <link rel="stylesheet" href="css/style.css">
-    <script src="js/index.js" defer></script>
+    <script src="js/config/config.js"></script>
 </head>
 
 <body>
@@ -27,6 +27,12 @@
         <div id="extra-measures-container"></div>
     </div>
     <div id="snackbar"></div>
+
+    <script src="socket.io.min.js"></script>
+    <script>
+        var socket = io(`${config.socketio.baseUrl}:${config.socketio.port}`);
+    </script>
+   <script src="js/index.js"></script>
 </body>
 
 </html>
