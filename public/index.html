@@ -12,7 +12,7 @@
 
 <body>
     <div id="container">
-        <img id="videoElement" src="http://192.168.1.94:8080?action=stream" alt="No stream"></img>        
+        <img id="videoElement" src="" alt="No stream"></img>        
     </div>
     <div id="stream-buttons-container" class="display-container">
         <button type="button" id="stop" class="button red">Stop</button>
@@ -29,9 +29,6 @@
     <div id="snackbar"></div>
 
     <script src="socket.io.min.js"></script>
-    <script>
-        var socket = io(`${config.socketio.baseUrl}:${config.socketio.port}`);
-    </script>
    <script src="js/index.js"></script>
 </body>
 

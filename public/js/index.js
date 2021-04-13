@@ -10,11 +10,12 @@
     var snackbar = document.getElementById("snackbar");
     var cpuTemp = document.getElementById("cpu-temp");
     var videoElement = document.getElementById("videoElement");
-    var src = videoElement.src;
+    var src = config.stream.baseUrl + ':' + config.stream.port + '?action=stream';
     var extraMeasuresContainer = document.getElementById("extra-measures-container");
 
     initAll();
 
+    var socket = io(`${config.socketio.baseUrl}:${config.socketio.port}`);
     socket.on("connect", () => {
         console.log(socket.id);
     });
@@ -28,6 +29,7 @@
         let extraMeasureType = 'confortmetre';
         measureExtra(extraMeasureType);
         setInterval(() => measureExtra(extraMeasureType), 120000);
+        videoElement.src = src;
     }
 
     function initVideoClickEvent() {
