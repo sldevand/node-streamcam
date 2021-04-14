@@ -20,20 +20,24 @@
     socket.on("streamStart", (data) => {
         refreshImage();
         const text = data.hasOwnProperty('success') ? data.success : data.error;
-        showSnackBar(data.success);
+        loading.style.display = 'none';
+        showSnackBar(text);
     });
     socket.on("streamStop", (data) => {
         refreshImage();
         const text = data.hasOwnProperty('success') ? data.success : data.error;
-        showSnackBar(data.success);
+        loading.style.display = 'none';
+        showSnackBar(text);
     });
 
     socket.on("disconnect", () => {
         showSnackBar('Disconnected from socketio server');
+        loading.style.display = 'none'
     });
 
     socket.on("connect", () => {
         showSnackBar('Connected to socketio server');
+        loading.style.display = 'none'
     });
 
     window.addEventListener('blur', () => {
@@ -44,9 +48,6 @@
         socket.connect();
     });
 
-    videoElement.onerror = () => {
-        loading.style.display = 'block'
-    }
     videoElement.onload = () => {
         loading.style.display = 'none'
     }
@@ -83,10 +84,12 @@
     }
 
     function startStream() {
+        loading.style.display = 'block';
         return fetch("/stream/start");
     }
 
     function stopStream() {
+        loading.style.display = 'block';
         return fetch("/stream/stop");
     }
 
