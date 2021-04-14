@@ -16,11 +16,31 @@
     initAll();
 
     var socket = io(`${config.socketio.baseUrl}:${config.socketio.port}`);
-    socket.on("streamStart", () => {
+    socket.on("streamStart", (data) => {
         refreshImage();
+        const text = data.hasOwnProperty('success') ? data.success : data.error;
+        showSnackBar(data.success);
     });
-    socket.on("streamStop", () => {
+    socket.on("streamStop", (data) => {
         refreshImage();
+        const text = data.hasOwnProperty('success') ? data.success : data.error;
+        showSnackBar(data.success);
+    });
+
+    socket.on("disconnect", () => {
+        showSnackBar('Disconnected from socketio server');
+    });
+
+    socket.on("connect", () => {
+        showSnackBar('Connected to socketio server');
+    });
+
+    window.addEventListener('blur', () => {
+        socket.disconnect();
+    });
+    
+    window.addEventListener('focus', () => {
+        socket.connect();
     });
 
     function initAll() {

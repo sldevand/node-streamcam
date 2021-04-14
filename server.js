@@ -35,22 +35,34 @@ const io = require("socket.io")(server, {
 var allClients = [];
 var timeout;
 io.sockets.on("connection", async (socket) => {
+    let alreadyConnected = allClients.find((client) => {
+        return client.conn.remoteAddress === socket.conn.remoteAddress
+    });
+
+    if (alreadyConnected) {
+        return;
+    }
+    
     allClients.push(socket);
     if (allClients.length === 1 && !timeout) {
         let result = await commands.execStream("start");
         console.log(result);
         emitTimedEvent("streamStart", result, streamConfig.startTimeout);
     }
-
+    console.log(`connected : ${socket.conn.remoteAddress}`);
+    console.log(`total : ${allClients.length}`);
     flushTimeout();
 
     socket.on("disconnect", async () => {
         var i = allClients.indexOf(socket);
         allClients.splice(i, 1);
+        console.log(`disconnected : ${socket.conn.remoteAddress}`);
+        console.log(`total : ${allClients.length}`);
         if (allClients.length !== 0) {
             return;
         }
         flushTimeout();
+        console.log(`No one is here anymore`);
         timeout = setTimeout(async () => {
             let result = await commands.execStream("stop");
             console.log(result);
