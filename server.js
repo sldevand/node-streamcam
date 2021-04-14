@@ -34,15 +34,7 @@ const io = require("socket.io")(server, {
 //SOCKETIO
 var allClients = [];
 var timeout;
-io.sockets.on("connection", async (socket) => {
-    let alreadyConnected = allClients.find((client) => {
-        return client.conn.remoteAddress === socket.conn.remoteAddress
-    });
-
-    if (alreadyConnected) {
-        return;
-    }
-    
+io.sockets.on("connection", async (socket) => {   
     allClients.push(socket);
     if (allClients.length === 1 && !timeout) {
         let result = await commands.execStream("start");
@@ -56,6 +48,13 @@ io.sockets.on("connection", async (socket) => {
     socket.on("disconnect", async () => {
         var i = allClients.indexOf(socket);
         allClients.splice(i, 1);
+        let doubledSocked = allClients.find((client) => {
+            return socket.conn.remoteAddress === client.conn.remoteAddress
+        })
+        if (doubledSocked) {
+            var j = allClients.indexOf(doubledSocked);
+            allClients.splice(j, 1);
+        }
         console.log(`disconnected : ${socket.conn.remoteAddress}`);
         console.log(`total : ${allClients.length}`);
         if (allClients.length !== 0) {

@@ -16,7 +16,8 @@
 
     initAll();
 
-    var socket = io(`${config.socketio.baseUrl}:${config.socketio.port}`);
+    var socket = io(`${config.socketio.baseUrl}:${config.socketio.port}`, { autoConnect: false });
+    socket.connect();
     socket.on("streamStart", (data) => {
         refreshImage();
         const text = data.hasOwnProperty('success') ? data.success : data.error;
