@@ -12,6 +12,7 @@
     var videoElement = document.getElementById("videoElement");
     var src = config.stream.baseUrl + ':' + config.stream.port + '?action=stream';
     var extraMeasuresContainer = document.getElementById("extra-measures-container");
+    var loading = document.getElementsByClassName("loading")[0];
 
     initAll();
 
@@ -42,6 +43,13 @@
     window.addEventListener('focus', () => {
         socket.connect();
     });
+
+    videoElement.onerror = () => {
+        loading.style.display = 'block'
+    }
+    videoElement.onload = () => {
+        loading.style.display = 'none'
+    }
 
     function initAll() {
         initVideoClickEvent();
