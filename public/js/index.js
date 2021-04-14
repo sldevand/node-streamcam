@@ -32,6 +32,7 @@
         let extraMeasureType = 'confortmetre';
         measureExtra(extraMeasureType);
         setInterval(() => measureExtra(extraMeasureType), 120000);
+        refreshImage();
     }
 
     function initVideoClickEvent() {
