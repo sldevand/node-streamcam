@@ -16,6 +16,9 @@ const utils = {
         let minutes = parseInt(parseTime[0]) * 60 + parseInt(parseTime[1]);
 
         return nowMinutes - minutes;
+    },
+    capitalizeFirstLetter: (string) => {
+        return string.charAt(0).toUpperCase() + string.slice(1);
     }
 };
 

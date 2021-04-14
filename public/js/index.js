@@ -16,8 +16,11 @@
     initAll();
 
     var socket = io(`${config.socketio.baseUrl}:${config.socketio.port}`);
-    socket.on("connect", () => {
-        console.log(socket.id);
+    socket.on("streamStart", () => {
+        refreshImage();
+    });
+    socket.on("streamStop", () => {
+        refreshImage();
     });
 
     function initAll() {
@@ -29,7 +32,6 @@
         let extraMeasureType = 'confortmetre';
         measureExtra(extraMeasureType);
         setInterval(() => measureExtra(extraMeasureType), 120000);
-        videoElement.src = src;
     }
 
     function initVideoClickEvent() {
@@ -52,17 +54,11 @@
     }
 
     function startStream() {
-        return fetchText("/stream/start").then((text) => {            
-            refreshImage();
-            showSnackBar(text);
-        });
+        return fetch("/stream/start");
     }
 
     function stopStream() {
-        return fetchText("/stream/stop").then((text) => {
-            refreshImage();
-            showSnackBar(text);
-        });
+        return fetch("/stream/stop");
     }
 
     function irOn() {
@@ -140,11 +136,9 @@
     }
 
     function refreshImage() {
-        setTimeout(() => {
-            var timestamp = new Date().getTime();
-            var queryString = "?t=" + timestamp;
+        var timestamp = new Date().getTime();
+        var queryString = "?t=" + timestamp;
 
-            videoElement.src = src + queryString;
-        }, 500);
+        videoElement.src = src + queryString;
     }
 })();

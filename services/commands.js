@@ -6,9 +6,9 @@ const commands = {
         commands.config = config;
         commands.irConfig = irConfig;
     },
-    execStream: async (res, action) => {
+    execStream: async (action) => {
         if (!['start', 'stop'].includes(action)) {
-            return res.send({ error: `No route found for stream/${action}` });
+            return { error: `No route found for stream/${action}` };
         }
 
         try {
@@ -28,9 +28,9 @@ const commands = {
                 successMessage += " and " + successMessage2;
             }
 
-            res.send({ success: successMessage });
+            return { success: successMessage };
         } catch (exception) {
-            res.send({ error: exception.message });
+            return { error: exception.message };
         }
     },
     execIrWithMessage: (res, action) => {

@@ -25,5 +25,9 @@
         "measure":{
             "cpu_temp" : ""
         }
+    },
+     "Stream": {
+        "stopTimeout": 5000,
+        "startTimeout": 500
     }
 }

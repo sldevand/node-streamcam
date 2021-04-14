@@ -5,6 +5,7 @@ const socketioConfig = config.get("Socketio");
 const extraUrls = config.get("ExtraUrls");
 const commandsConfig = config.get("Commands");
 const irRestrictConfig = config.get("IrRestrict");
+const streamConfig = config.get("Stream");
 
 //UTILS
 const utils = require("./helper/utils");
@@ -21,12 +22,55 @@ const favicon = require("serve-favicon");
 const express = require("express");
 const app = express();
 const http = require("http");
+
+//SOCKETIO
 const server = http.createServer(app);
-const io = require("socket.io")(server,{
+const io = require("socket.io")(server, {
     cors: {
-      origin: "*"
+        origin: "*",
+    },
+});
+
+//SOCKETIO
+var allClients = [];
+var timeout;
+io.sockets.on("connection", async (socket) => {
+    allClients.push(socket);
+    if (allClients.length === 1) {
+        let result = await commands.execStream("start");
+        console.log(result);
+        emitTimedEvent(
+            "streamStart",
+            result,
+            streamConfig.startTimeout
+        );
     }
-  });
+
+    if (timeout) {
+        clearTimeout(timeout);
+    }
+
+    socket.on("disconnect", async () => {
+        var i = allClients.indexOf(socket);
+        allClients.splice(i, 1);
+        if (allClients.length !== 0) {
+            return;
+        }
+        if (timeout) {
+            clearTimeout(timeout);
+        }
+        timeout = setTimeout(async () => {
+            let result = await commands.execStream("stop");
+            console.log(result);
+            emitTimedEvent(
+                "streamStop",
+                result,
+                streamConfig.stopTimeout
+            );
+        }, streamConfig.stopTimeout);
+    });
+});
+
 
 //MIDDLEWARES
 app.use(express.static("public"));
@@ -35,7 +79,16 @@ app.use(favicon(path.join(__dirname, "public", "favicon.ico")));
 
 //ROUTES
 app.get("/stream/:action", async (req, res) => {
-    commands.execStream(res, req.params.action);
+    const action = req.params.action;
+    const result = await commands.execStream(action);
+
+    if (result.hasOwnProperty('success')) {
+        emitTimedEvent("stream" + utils.capitalizeFirstLetter(action), result, streamConfig.startTimeout);
+    } else {
+        socket.emit('error', result);
+    }
+
+    res.send(result);
 });
 
 app.get("/ir/:action", (req, res) => {
@@ -65,15 +118,15 @@ app.get("/measure/extra/:type", (req, res) => {
 
 // LISTEN
 app.listen(serverConfig.port, () => {
-    console.log(
-        `Node-streamcam app listening on port ${serverConfig.port}`
-    );
-});
-
-io.on("connection", (socket) => {
-    console.log("a user connected");
+    console.log(`Node-streamcam app listening on port ${serverConfig.port}`);
 });
 
 server.listen(socketioConfig.port, () => {
     console.log(`socketio listening listening on port ${socketioConfig.port}`);
 });
+
+function emitTimedEvent(event, data, timeout) {
+    setTimeout(() => {
+        io.sockets.emit(event, data);
+    }, timeout);
+}
