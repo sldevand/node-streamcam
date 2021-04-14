@@ -84,6 +84,8 @@ app.get("/stream/:action", async (req, res) => {
         socket.emit('error', result);
     }
 
+    flushTimeout();
+
     res.send(result);
 });
 
