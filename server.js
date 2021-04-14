@@ -60,6 +60,7 @@ io.sockets.on("connection", async (socket) => {
             let result = await commands.execStream("stop");
             console.log(result);
             emitTimedEvent("streamStop", result, streamConfig.stopTimeout);
+            timeout = undefined;
         }, streamConfig.stopTimeout);
     });
 });
