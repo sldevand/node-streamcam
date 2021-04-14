@@ -42,10 +42,7 @@ io.sockets.on("connection", async (socket) => {
         emitTimedEvent("streamStart", result, streamConfig.startTimeout);
     }
 
-    if (timeout) {
-        clearTimeout(timeout);
-        timeout = undefined;
-    }
+    flushTimeout();
 
     socket.on("disconnect", async () => {
         var i = allClients.indexOf(socket);
@@ -53,17 +50,23 @@ io.sockets.on("connection", async (socket) => {
         if (allClients.length !== 0) {
             return;
         }
-        if (timeout) {
-            clearTimeout(timeout);
-        }
+        flushTimeout();
         timeout = setTimeout(async () => {
             let result = await commands.execStream("stop");
             console.log(result);
             emitTimedEvent("streamStop", result, streamConfig.stopTimeout);
-            timeout = undefined;
+            flushTimeout();
         }, streamConfig.stopTimeout);
     });
 });
+
+function flushTimeout()
+{
+    if (timeout) {
+        clearTimeout(timeout);
+        timeout = undefined;
+    }
+}
 
 //MIDDLEWARES
 app.use(express.static("public"));
