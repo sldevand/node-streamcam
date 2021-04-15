@@ -1,187 +1,173 @@
-(function () {
-    var startButton = document.getElementById("start");
-    var stopButton = document.getElementById("stop");
-    var container = document.getElementById("container");
-    var displayContainers = document.getElementsByClassName(
-        "display-container"
-    );
-    var onButton = document.getElementById("on");
-    var offButton = document.getElementById("off");
-    var snackbar = document.getElementById("snackbar");
-    var cpuTemp = document.getElementById("cpu-temp");
-    var videoElement = document.getElementById("videoElement");
-    var src = config.stream.baseUrl + ':' + config.stream.port + '?action=stream';
-    var extraMeasuresContainer = document.getElementById("extra-measures-container");
-    var loading = document.getElementsByClassName("loading")[0];
+import Snackbar from "./modules/snackbar.mjs";
+import Widget from "./modules/widget.mjs";
 
-    initAll();
+var snackbar = new Snackbar("#snackbar");
+var loader = new Widget(".loading");
 
-    var socket = io(`${config.socketio.baseUrl}:${config.socketio.port}`, { autoConnect: false });
+var startButton = document.getElementById("start");
+var stopButton = document.getElementById("stop");
+var container = document.getElementById("container");
+var displayContainers = document.getElementsByClassName("display-container");
+var onButton = document.getElementById("on");
+var offButton = document.getElementById("off");
+
+var cpuTemp = document.getElementById("cpu-temp");
+var videoElement = document.getElementById("videoElement");
+var src = config.stream.baseUrl + ":" + config.stream.port + "?action=stream";
+var extraMeasuresContainer = document.getElementById(
+    "extra-measures-container"
+);
+
+initAll();
+
+var socket = io(`${config.socketio.baseUrl}:${config.socketio.port}`, {
+    autoConnect: false,
+});
+socket.connect();
+socket
+    .on("streamStart", (data) => {
+        handleStreamAction(data);
+    })
+    .on("streamStop", (data) => {
+        handleStreamAction(data);
+    })
+    .on("disconnect", () => {
+        snackbar.show("Disconnected from socketio server");
+        loader.hide();
+    })
+    .on("connect", () => {
+        snackbar.show("Connected to socketio server");
+        loader.hide();
+    });
+
+window.addEventListener("blur", () => {
+    socket.disconnect();
+});
+
+window.addEventListener("focus", () => {
     socket.connect();
-    socket
-        .on("streamStart", (data) => {
-            handleStreamAction(data);
-        })
-        .on("streamStop", (data) => {
-            handleStreamAction(data);
-        })
-        .on("disconnect", () => {
-            showSnackBar("Disconnected from socketio server");
-            hideLoader();
-        })
-        .on("connect", () => {
-            showSnackBar("Connected to socketio server");
-            hideLoader();
-        });
+});
 
-    window.addEventListener('blur', () => {
-        socket.disconnect();
+videoElement.onload = () => {
+    loader.hide();
+};
+
+function initAll() {
+    initVideoClickEvent();
+    initStreamButtonsEvents();
+    initIrButtonsEvents();
+    measureCpuTemp();
+    setInterval(measureCpuTemp, 5000);
+    let extraMeasureType = "confortmetre";
+    measureExtra(extraMeasureType);
+    setInterval(() => measureExtra(extraMeasureType), 120000);
+    refreshImage();
+}
+
+function initVideoClickEvent() {
+    container.addEventListener("click", () => {
+        Array.prototype.forEach.call(displayContainers, displayContainerToggle);
     });
-    
-    window.addEventListener('focus', () => {
-        socket.connect();
+}
+
+function initStreamButtonsEvents() {
+    startButton.addEventListener("click", startStream);
+    stopButton.addEventListener("click", stopStream);
+}
+
+function initIrButtonsEvents() {
+    onButton.addEventListener("click", irOn);
+    offButton.addEventListener("click", irOff);
+}
+
+function startStream() {
+    loader.show();
+    return fetch("/stream/start");
+}
+
+function stopStream() {
+    loader.show();
+    return fetch("/stream/stop");
+}
+
+function irOn() {
+    return fetchWithMessage("/ir/on");
+}
+
+function irOff() {
+    return fetchWithMessage("/ir/off");
+}
+
+function measureCpuTemp() {
+    fetchText("/measure/temp", "--").then(function (text) {
+        // Reformat text from stdout
+        if (text.includes("temp=")) {
+            var splitTemp = text.split("=")[1];
+            text = splitTemp.substring(0, splitTemp.length - 2);
+        }
+        cpuTemp.innerText = "Cpu=" + text + " °C";
     });
+}
 
-    videoElement.onload = () => {
-        hideLoader();
-    }
-
-    function initAll() {
-        initVideoClickEvent();
-        initStreamButtonsEvents();
-        initIrButtonsEvents();
-        measureCpuTemp();
-        setInterval(measureCpuTemp, 5000);
-        let extraMeasureType = 'confortmetre';
-        measureExtra(extraMeasureType);
-        setInterval(() => measureExtra(extraMeasureType), 120000);
-        refreshImage();
-    }
-
-    function initVideoClickEvent() {
-        container.addEventListener("click", () => {
-            Array.prototype.forEach.call(
-                displayContainers,
-                displayContainerToggle
-            );
-        });
-    }
-
-    function initStreamButtonsEvents() {
-        startButton.addEventListener("click", startStream);
-        stopButton.addEventListener("click", stopStream);
-    }
-
-    function initIrButtonsEvents() {
-        onButton.addEventListener("click", irOn);
-        offButton.addEventListener("click", irOff);
-    }
-
-    function startStream() {
-        showLoader();
-        return fetch("/stream/start");
-    }
-
-    function stopStream() {
-        showLoader();
-        return fetch("/stream/stop");
-    }
-
-    function irOn() {
-        return fetchWithMessage("/ir/on");
-    }
-
-    function irOff() {
-        return fetchWithMessage("/ir/off");
-    }
-
-    function measureCpuTemp() {
-        fetchText("/measure/temp", "--").then(function (text) {
-            // Reformat text from stdout
-            if (text.includes('temp=')) {
-                var splitTemp = text.split('=')[1];
-                text = splitTemp.substring(0, splitTemp.length - 2);
-            }
-            cpuTemp.innerText = 'Cpu=' + text + ' °C';
-        });
-    }
-
-    function measureExtra(endpoint) {
-        fetchJson(`/measure/extra/${endpoint}`, "--").then(function (json) {
-            if (json.error) {
-                extraMeasuresContainer.innerHTML = `<span>${endpoint} = -- °C | -- %</span>`;
-                return;
-            }
-
-            let sensor = json.success;
-            if (Array.isArray(sensor) && sensor.length > 0) {
-                sensor = sensor[0];
-            }
-            extraMeasuresContainer.innerHTML = `<span>${endpoint} = ${sensor.valeur1 || '--'} °C | ${sensor.valeur2 || '--'} %</span>`;
-        });
-    }
-
-    function displayContainerToggle(container) {
-        var display;
-        if (!container.style.display || container.style.display === "none") {
-            display = "block";
-        } else {
-            display = "none";
+function measureExtra(endpoint) {
+    fetchJson(`/measure/extra/${endpoint}`, "--").then(function (json) {
+        if (json.error) {
+            extraMeasuresContainer.innerHTML = `<span>${endpoint} = -- °C | -- %</span>`;
+            return;
         }
 
-        container.style.display = display;
+        let sensor = json.success;
+        if (Array.isArray(sensor) && sensor.length > 0) {
+            sensor = sensor[0];
+        }
+        extraMeasuresContainer.innerHTML = `<span>${endpoint} = ${
+            sensor.valeur1 || "--"
+        } °C | ${sensor.valeur2 || "--"} %</span>`;
+    });
+}
+
+function displayContainerToggle(container) {
+    var display;
+    if (!container.style.display || container.style.display === "none") {
+        display = "block";
+    } else {
+        display = "none";
     }
 
-    function fetchJson(endpoint) {
-        return fetch(endpoint).then(function (response) {
-            return response.json();
-        });
-    }
+    container.style.display = display;
+}
 
-    function fetchText(endpoint, errorMessage) {
-        return fetchJson(endpoint).then(function (json) {
-            if (errorMessage) {
-                json.error = errorMessage;
-            }
-            return json.success ? json.success : json.error;
-        });
-    }
+function fetchJson(endpoint) {
+    return fetch(endpoint).then(function (response) {
+        return response.json();
+    });
+}
 
-    function fetchWithMessage(endpoint) {
-        return fetchText(endpoint).then(function (text) {
-            showSnackBar(text);
-        });
-    }
+function fetchText(endpoint, errorMessage) {
+    return fetchJson(endpoint).then(function (json) {
+        if (errorMessage) {
+            json.error = errorMessage;
+        }
+        return json.success ? json.success : json.error;
+    });
+}
 
-    function showSnackBar(text) {
-        snackbar.className = "show";
-        snackbar.innerHTML = text;
-        setTimeout(function () {
-            snackbar.className = snackbar.className.replace("show", "");
-        }, 3000);
-    }
+function fetchWithMessage(endpoint) {
+    return fetchText(endpoint).then(function (text) {
+        snackbar.show(text);
+    });
+}
 
-    function refreshImage() {
-        var timestamp = new Date().getTime();
-        var queryString = "?t=" + timestamp;
+function refreshImage() {
+    var timestamp = new Date().getTime();
+    var queryString = "?t=" + timestamp;
 
-        videoElement.src = src + queryString;
-    }
+    videoElement.src = src + queryString;
+}
 
-    function handleStreamAction(data) {
-        refreshImage();
-        const text = data.hasOwnProperty("success")
-            ? data.success
-            : data.error;
-        hideLoader();
-        showSnackBar(text);
-    }
-
-    function showLoader() {
-        loading.style.display = 'block';
-    }
-
-    function hideLoader() {
-        loading.style.display = 'none';
-    }
-})();
+function handleStreamAction(data) {
+    refreshImage();
+    const text = data.hasOwnProperty("success") ? data.success : data.error;
+    loader.hide();
+    snackbar.show(text);
+}
