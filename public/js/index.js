@@ -18,28 +18,21 @@
 
     var socket = io(`${config.socketio.baseUrl}:${config.socketio.port}`, { autoConnect: false });
     socket.connect();
-    socket.on("streamStart", (data) => {
-        refreshImage();
-        const text = data.hasOwnProperty('success') ? data.success : data.error;
-        loading.style.display = 'none';
-        showSnackBar(text);
-    });
-    socket.on("streamStop", (data) => {
-        refreshImage();
-        const text = data.hasOwnProperty('success') ? data.success : data.error;
-        loading.style.display = 'none';
-        showSnackBar(text);
-    });
-
-    socket.on("disconnect", () => {
-        showSnackBar('Disconnected from socketio server');
-        loading.style.display = 'none'
-    });
-
-    socket.on("connect", () => {
-        showSnackBar('Connected to socketio server');
-        loading.style.display = 'none'
-    });
+    socket
+        .on("streamStart", (data) => {
+            handleStreamAction(data);
+        })
+        .on("streamStop", (data) => {
+            handleStreamAction(data);
+        })
+        .on("disconnect", () => {
+            showSnackBar("Disconnected from socketio server");
+            hideLoader();
+        })
+        .on("connect", () => {
+            showSnackBar("Connected to socketio server");
+            hideLoader();
+        });
 
     window.addEventListener('blur', () => {
         socket.disconnect();
@@ -50,7 +43,7 @@
     });
 
     videoElement.onload = () => {
-        loading.style.display = 'none'
+        hideLoader();
     }
 
     function initAll() {
@@ -85,12 +78,12 @@
     }
 
     function startStream() {
-        loading.style.display = 'block';
+        showLoader();
         return fetch("/stream/start");
     }
 
     function stopStream() {
-        loading.style.display = 'block';
+        showLoader();
         return fetch("/stream/stop");
     }
 
@@ -173,5 +166,22 @@
         var queryString = "?t=" + timestamp;
 
         videoElement.src = src + queryString;
+    }
+
+    function handleStreamAction(data) {
+        refreshImage();
+        const text = data.hasOwnProperty("success")
+            ? data.success
+            : data.error;
+        hideLoader();
+        showSnackBar(text);
+    }
+
+    function showLoader() {
+        loading.style.display = 'block';
+    }
+
+    function hideLoader() {
+        loading.style.display = 'none';
     }
 })();
