@@ -122,7 +122,7 @@ app.get("/measure/extra/:type", (req, res) => {
         return;
     }
 
-    return res.send({ error: "No  measure urls found" });
+    return res.send({ error: "No  measure urls found, check ExtraUrls config" });
 });
 
 // LISTEN

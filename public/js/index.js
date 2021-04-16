@@ -1,22 +1,25 @@
-import Snackbar from "./modules/snackbar.mjs";
-import Widget from "./modules/widget.mjs";
+import Snackbar from './modules/snackbar.mjs';
+import Widget from './modules/widget.mjs';
+import Sensor from './modules/sensor.mjs';
+import Cpu from './modules/cpu.mjs';
 
-var snackbar = new Snackbar("#snackbar");
-var loader = new Widget(".loading");
+var snackbar = new Snackbar('#snackbar');
+var loader = new Widget('.loading');
+var sensors = {
+    confortmetre : new Sensor('#extra-measures-container', 'confortmetre')
+};
+var cpu = new Cpu('#cpu-temp');
 
-var startButton = document.getElementById("start");
-var stopButton = document.getElementById("stop");
-var container = document.getElementById("container");
-var displayContainers = document.getElementsByClassName("display-container");
-var onButton = document.getElementById("on");
-var offButton = document.getElementById("off");
+var startButton = document.getElementById('start');
+var stopButton = document.getElementById('stop');
+var container = document.getElementById('container');
+var displayContainers = document.getElementsByClassName('display-container');
+var onButton = document.getElementById('on');
+var offButton = document.getElementById('off');
 
-var cpuTemp = document.getElementById("cpu-temp");
-var videoElement = document.getElementById("videoElement");
-var src = config.stream.baseUrl + ":" + config.stream.port + "?action=stream";
-var extraMeasuresContainer = document.getElementById(
-    "extra-measures-container"
-);
+var videoElement = document.getElementById('videoElement');
+var src = config.stream.baseUrl + ':' + config.stream.port + '?action=stream';
+
 
 initAll();
 
@@ -25,26 +28,24 @@ var socket = io(`${config.socketio.baseUrl}:${config.socketio.port}`, {
 });
 socket.connect();
 socket
-    .on("streamStart", (data) => {
+    .on('streamStart', (data) => {
         handleStreamAction(data);
     })
-    .on("streamStop", (data) => {
+    .on('streamStop', (data) => {
         handleStreamAction(data);
     })
-    .on("disconnect", () => {
-        snackbar.show("Disconnected from socketio server");
+    .on('disconnect', () => {
         loader.hide();
     })
-    .on("connect", () => {
-        snackbar.show("Connected to socketio server");
+    .on('connect', () => {
         loader.hide();
     });
 
-window.addEventListener("blur", () => {
+window.addEventListener('blur', () => {
     socket.disconnect();
 });
 
-window.addEventListener("focus", () => {
+window.addEventListener('focus', () => {
     socket.connect();
 });
 
@@ -58,93 +59,82 @@ function initAll() {
     initIrButtonsEvents();
     measureCpuTemp();
     setInterval(measureCpuTemp, 5000);
-    let extraMeasureType = "confortmetre";
+    let extraMeasureType = 'confortmetre';
     measureExtra(extraMeasureType);
     setInterval(() => measureExtra(extraMeasureType), 120000);
     refreshImage();
 }
 
 function initVideoClickEvent() {
-    container.addEventListener("click", () => {
+    container.addEventListener('click', () => {
         Array.prototype.forEach.call(displayContainers, displayContainerToggle);
     });
 }
 
 function initStreamButtonsEvents() {
-    startButton.addEventListener("click", startStream);
-    stopButton.addEventListener("click", stopStream);
+    startButton.addEventListener('click', startStream);
+    stopButton.addEventListener('click', stopStream);
 }
 
 function initIrButtonsEvents() {
-    onButton.addEventListener("click", irOn);
-    offButton.addEventListener("click", irOff);
+    onButton.addEventListener('click', irOn);
+    offButton.addEventListener('click', irOff);
 }
 
 function startStream() {
     loader.show();
-    return fetch("/stream/start");
+    return fetch('/stream/start');
 }
 
 function stopStream() {
     loader.show();
-    return fetch("/stream/stop");
+    return fetch('/stream/stop');
 }
 
 function irOn() {
-    return fetchWithMessage("/ir/on");
+    return fetchWithMessage('/ir/on');
 }
 
 function irOff() {
-    return fetchWithMessage("/ir/off");
+    return fetchWithMessage('/ir/off');
 }
 
 function measureCpuTemp() {
-    fetchText("/measure/temp", "--").then(function (text) {
-        // Reformat text from stdout
-        if (text.includes("temp=")) {
-            var splitTemp = text.split("=")[1];
-            text = splitTemp.substring(0, splitTemp.length - 2);
-        }
-        cpuTemp.innerText = "Cpu=" + text + " °C";
+    fetchText('/measure/temp', '--').then((text) => {
+        cpu.setData(text);
     });
 }
 
 function measureExtra(endpoint) {
-    fetchJson(`/measure/extra/${endpoint}`, "--").then(function (json) {
+    fetchJson(`/measure/extra/${endpoint}`, '--').then((json) => {
         if (json.error) {
-            extraMeasuresContainer.innerHTML = `<span>${endpoint} = -- °C | -- %</span>`;
+            snackbar.show(json.error);
             return;
         }
 
-        let sensor = json.success;
-        if (Array.isArray(sensor) && sensor.length > 0) {
-            sensor = sensor[0];
-        }
-        extraMeasuresContainer.innerHTML = `<span>${endpoint} = ${
-            sensor.valeur1 || "--"
-        } °C | ${sensor.valeur2 || "--"} %</span>`;
+        sensors[endpoint].setData(json.success);
     });
 }
 
 function displayContainerToggle(container) {
     var display;
-    if (!container.style.display || container.style.display === "none") {
-        display = "block";
+    if (!container.style.display || container.style.display === 'none') {
+        display = 'block';
     } else {
-        display = "none";
+        display = 'none';
     }
 
     container.style.display = display;
 }
 
 function fetchJson(endpoint) {
-    return fetch(endpoint).then(function (response) {
+    return fetch(endpoint).then((response) => {
         return response.json();
     });
 }
 
 function fetchText(endpoint, errorMessage) {
-    return fetchJson(endpoint).then(function (json) {
+    return fetchJson(endpoint).then((json) => {
         if (errorMessage) {
             json.error = errorMessage;
         }
@@ -153,21 +143,21 @@ function fetchText(endpoint, errorMessage) {
 }
 
 function fetchWithMessage(endpoint) {
-    return fetchText(endpoint).then(function (text) {
+    return fetchText(endpoint).then((text) => {
         snackbar.show(text);
     });
 }
 
 function refreshImage() {
     var timestamp = new Date().getTime();
-    var queryString = "?t=" + timestamp;
+    var queryString = '?t=' + timestamp;
 
     videoElement.src = src + queryString;
 }
 
 function handleStreamAction(data) {
     refreshImage();
-    const text = data.hasOwnProperty("success") ? data.success : data.error;
+    const text = data.hasOwnProperty('success') ? data.success : data.error;
     loader.hide();
     snackbar.show(text);
 }

@@ -4,10 +4,14 @@ export default class Widget {
     }
 
     show() {
-        this.selector.style.display = "block";
+        this.selector.style.display = 'block';
     }
 
     hide() {
-        this.selector.style.display = "none";
+        this.selector.style.display = 'none';
+    }
+
+    render() {
+        throw new Error('You have to implement the render() method!');
     }
 }
