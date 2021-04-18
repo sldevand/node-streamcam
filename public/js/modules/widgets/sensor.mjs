@@ -1,4 +1,5 @@
 import Widget from './widget.mjs';
+
 export default class Sensor extends Widget {
     constructor(querySelector, name) {
         super(querySelector);

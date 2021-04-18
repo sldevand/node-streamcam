@@ -1,7 +1,8 @@
-import Snackbar from './modules/snackbar.mjs';
-import Widget from './modules/widget.mjs';
-import Sensor from './modules/sensor.mjs';
-import Cpu from './modules/cpu.mjs';
+import Snackbar from './modules/widgets/snackbar.mjs';
+import Widget from './modules/widgets/widget.mjs';
+import Sensor from './modules/widgets/sensor.mjs';
+import Cpu from './modules/widgets/cpu.mjs';
+import Network from './modules/services/network.mjs';
 
 var snackbar = new Snackbar('#snackbar');
 var loader = new Widget('.loading');
@@ -9,6 +10,7 @@ var sensors = {
     confortmetre : new Sensor('#extra-measures-container', 'confortmetre')
 };
 var cpu = new Cpu('#cpu-temp');
+var network = new Network();
 
 var startButton = document.getElementById('start');
 var stopButton = document.getElementById('stop');
@@ -100,13 +102,13 @@ function irOff() {
 }
 
 function measureCpuTemp() {
-    fetchText('/measure/temp', '--').then((text) => {
+    network.fetchText('/measure/temp', '--').then((text) => {
         cpu.setData(text);
     });
 }
 
 function measureExtra(endpoint) {
-    fetchJson(`/measure/extra/${endpoint}`, '--').then((json) => {
+    network.fetchJson(`/measure/extra/${endpoint}`, '--').then((json) => {
         if (json.error) {
             snackbar.show(json.error);
             return;
@@ -117,7 +119,7 @@ function measureExtra(endpoint) {
 }
 
 function displayContainerToggle(container) {
-    var display;
+    let display;
     if (!container.style.display || container.style.display === 'none') {
         display = 'block';
     } else {
@@ -127,30 +129,15 @@ function displayContainerToggle(container) {
     container.style.display = display;
 }
 
-function fetchJson(endpoint) {
-    return fetch(endpoint).then((response) => {
-        return response.json();
-    });
-}
-
-function fetchText(endpoint, errorMessage) {
-    return fetchJson(endpoint).then((json) => {
-        if (errorMessage) {
-            json.error = errorMessage;
-        }
-        return json.success ? json.success : json.error;
-    });
-}
-
 function fetchWithMessage(endpoint) {
-    return fetchText(endpoint).then((text) => {
+    return network.fetchText(endpoint).then((text) => {
         snackbar.show(text);
     });
 }
 
 function refreshImage() {
-    var timestamp = new Date().getTime();
-    var queryString = '?t=' + timestamp;
+    let timestamp = new Date().getTime();
+    let queryString = '?t=' + timestamp;
 
     videoElement.src = src + queryString;
 }
