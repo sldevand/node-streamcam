@@ -3,6 +3,7 @@ import Widget from './modules/widgets/widget.mjs';
 import Sensor from './modules/widgets/sensor.mjs';
 import Cpu from './modules/widgets/cpu.mjs';
 import Network from './modules/services/network.mjs';
+import Video from './modules/widgets/video.mjs';
 
 var snackbar = new Snackbar('#snackbar');
 var loader = new Widget('.loading');
@@ -11,6 +12,9 @@ var sensors = {
 };
 var cpu = new Cpu('#cpu-temp');
 var network = new Network();
+var src = config.stream.baseUrl + ':' + config.stream.port + '?action=stream';
+var video = new Video('#videoElement', src);
+video.onLoadListener(loader.hide);
 
 var startButton = document.getElementById('start');
 var stopButton = document.getElementById('stop');
@@ -19,10 +23,6 @@ var displayContainers = document.getElementsByClassName('display-container');
 var onButton = document.getElementById('on');
 var offButton = document.getElementById('off');
 
-var videoElement = document.getElementById('videoElement');
-var src = config.stream.baseUrl + ':' + config.stream.port + '?action=stream';
-
-
 initAll();
 
 var socket = io(`${config.socketio.baseUrl}:${config.socketio.port}`, {
@@ -30,18 +30,10 @@ var socket = io(`${config.socketio.baseUrl}:${config.socketio.port}`, {
 });
 socket.connect();
 socket
-    .on('streamStart', (data) => {
-        handleStreamAction(data);
-    })
-    .on('streamStop', (data) => {
-        handleStreamAction(data);
-    })
-    .on('disconnect', () => {
-        loader.hide();
-    })
-    .on('connect', () => {
-        loader.hide();
-    });
+    .on('streamStart', handleStreamAction)
+    .on('streamStop', handleStreamAction)
+    .on('disconnect', () => loader.hide())
+    .on('connect', () => loader.hide());
 
 window.addEventListener('blur', () => {
     socket.disconnect();
@@ -50,10 +42,6 @@ window.addEventListener('blur', () => {
 window.addEventListener('focus', () => {
     socket.connect();
 });
-
-videoElement.onload = () => {
-    loader.hide();
-};
 
 function initAll() {
     initVideoClickEvent();
@@ -64,7 +52,7 @@ function initAll() {
     let extraMeasureType = 'confortmetre';
     measureExtra(extraMeasureType);
     setInterval(() => measureExtra(extraMeasureType), 120000);
-    refreshImage();
+    video.refresh();
 }
 
 function initVideoClickEvent() {
@@ -135,16 +123,9 @@ function fetchWithMessage(endpoint) {
     });
 }
 
-function refreshImage() {
-    let timestamp = new Date().getTime();
-    let queryString = '?t=' + timestamp;
-
-    videoElement.src = src + queryString;
-}
-
 function handleStreamAction(data) {
-    refreshImage();
-    const text = data.hasOwnProperty('success') ? data.success : data.error;
+    video.refresh();
     loader.hide();
+    const text = data.hasOwnProperty('success') ? data.success : data.error;
     snackbar.show(text);
 }
