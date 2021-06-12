@@ -82,6 +82,11 @@
     background-color: #ff1744;
 }
 
+#debug {
+    color: whitesmoke;
+    z-index: 100000;
+}
+
 body {
     background-color: #747474;
     margin: 0 auto;
