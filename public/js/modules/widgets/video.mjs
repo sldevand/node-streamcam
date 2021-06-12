@@ -4,10 +4,11 @@ export default class Video extends Widget {
     constructor(querySelector, src) {
         super(querySelector);
         this.src = src;
-        this.selector.addEventListener('gesturechange', this.onZoom);
+        this.selector.addEventListener('gesturechange',(event) => this.onZoom(event));
 
 
-        this.selector.addEventListener('wheel', this.onZoom);
+        this.selector.addEventListener('wheel', (event) => this.onZoom(event));
+        this.scale=1.0;
     }
 
     refresh() {
@@ -22,20 +23,20 @@ export default class Video extends Widget {
     }
 
     onZoom(event) {
-        ev.preventDefault();
-        let isPinch = ev.deltaY < 50;
-        let scale = 1.0;
+        event.preventDefault();
+        let isPinch = event.deltaY < 50;
+        
         if (isPinch) {
             // This is a pinch on a trackpad
-            let factor = 1 - 0.01 * ev.deltaY;
-            scale *= factor;
-            this.selector.style.transform = `scale(${scale})`;
+            let factor = 1 - 0.01 * event.deltaY;
+            this.scale *= factor;
+            this.selector.style.transform = `scale(${this.scale})`;
         } else {
             // This is a mouse wheel
-            let strength = 1.4;
-            let factor = ev.deltaY < 0 ? strength : 1.0 / strength;
-            scale *= factor;
-            this.selector.style.transform = `scale(${scale})`;
+            let strength = 1.1;
+            let factor = event.deltaY < 0 ? strength : 1.0 / strength;
+            this.scale *= factor;
+            this.selector.style.transform = `scale(${this.scale})`;
         }
     }
 }
