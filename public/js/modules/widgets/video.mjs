@@ -54,7 +54,7 @@ export default class Video extends Widget {
         if (this.evCache.length === 2) {
             var curDiff = Math.abs(this.evCache[0].clientX - this.evCache[1].clientX);
             if (this.prevDiff > 0) {
-                let factor = 0.01 * (curDiff - this.prevDiff);
+                let factor = 0.03 * (curDiff - this.prevDiff);
                 this.setScale(this.getScale() + factor);
             }
 
