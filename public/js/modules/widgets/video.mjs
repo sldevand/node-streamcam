@@ -44,12 +44,11 @@ export default class Video extends Widget {
         for (var i = 0; i < this.evCache.length; i++) {
             if (ev.pointerId == this.evCache[i].pointerId) {
                 this.evCache[i] = ev;
+                if (this.evCache.length === 1 && this.getScale() > 1) {
+                    this.move(ev);
+                }
                 break;
             }
-        }
-
-        if (this.evCache.length === 1 && this.getScale() > 1) {
-            this.move(ev);
         }
 
         if (this.evCache.length === 2) {
@@ -103,6 +102,7 @@ export default class Video extends Widget {
         let diffY = (ev.clientY - this.selector.clientHeight / 2) - this.prevPosition.y;
         this.position.x += diffX;
         this.position.y += diffY;
+
         this.updateTransform();
     }
 
