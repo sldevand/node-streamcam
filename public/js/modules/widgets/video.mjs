@@ -21,7 +21,7 @@ export default class Video extends Widget {
 
     resetPosition() {
         this.position = { x: 0.0, y: 0.0 }
-        this.prevPosition = this.position;
+        this.copyPrevPosition();
         this.updateTransform();
     }
 
@@ -67,7 +67,7 @@ export default class Video extends Widget {
         if (this.evCache.length < 2) {
             this.prevDiff = -1;
         }
-        this.prevPosition = this.position;
+        this.copyPrevPosition();
     }
 
     removeEvent(ev) {
@@ -100,10 +100,14 @@ export default class Video extends Widget {
     move(ev) {
         let diffX = (ev.clientX - this.selector.clientWidth / 2) - this.prevPosition.x;
         let diffY = (ev.clientY - this.selector.clientHeight / 2) - this.prevPosition.y;
-        this.position.x += diffX;
-        this.position.y += diffY;
+        this.position.x += diffX * 0.5;
+        this.position.y += diffY * 0.5;
 
         this.updateTransform();
+    }
+
+    copyPrevPosition() {
+        Object.assign(this.prevPosition, this.position);
     }
 
     updateTransform() {
