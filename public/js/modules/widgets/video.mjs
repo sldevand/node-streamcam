@@ -44,18 +44,17 @@ export default class Video extends Widget {
         for (var i = 0; i < this.evCache.length; i++) {
             if (ev.pointerId == this.evCache[i].pointerId) {
                 this.evCache[i] = ev;
+                if (this.evCache.length === 1 && this.getScale() > 1) {
+                    this.move(ev);
+                }
                 break;
             }
-        }
-
-        if (this.evCache.length === 1 && this.getScale() > 1) {
-            this.move(ev);
         }
 
         if (this.evCache.length === 2) {
             var curDiff = Math.abs(this.evCache[0].clientX - this.evCache[1].clientX);
             if (this.prevDiff > 0) {
-                let factor = 0.01 * (curDiff - this.prevDiff);
+                let factor = 0.03 * (curDiff - this.prevDiff);
                 this.setScale(this.getScale() + factor);
             }
 
@@ -103,6 +102,7 @@ export default class Video extends Widget {
         let diffY = (ev.clientY - this.selector.clientHeight / 2) - this.prevPosition.y;
         this.position.x += diffX;
         this.position.y += diffY;
+
         this.updateTransform();
     }
 
