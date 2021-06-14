@@ -20,8 +20,8 @@ export default class Video extends Widget {
     }
 
     resetPosition() {
-        this.position = { x: 0.0, y: 0.0 }
-        this.copyPrevPosition();
+        this.position = { x: 0.0, y: 0.0 };
+        this.prevPosition = { x: 0.0, y: 0.0 };
         this.updateTransform();
     }
 
