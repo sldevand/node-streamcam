@@ -1,13 +1,15 @@
 import Widget from './widget.mjs';
-var evCache = new Array();
-var prevDiff = -1;
+
 export default class Video extends Widget {
     constructor(querySelector, src) {
         super(querySelector);
         this.src = src;
         this.selector.addEventListener('wheel', (event) => this.onZoom(event));
         this.scale = 1.0;
+        this.resetPosition();
         this.initPinchZoomEvents();
+        this.evCache = new Array();
+        this.prevDiff = -1;
     }
 
     refresh() {
@@ -15,6 +17,12 @@ export default class Video extends Widget {
         let queryString = '?t=' + timestamp;
 
         this.selector.src = this.src + queryString;
+    }
+
+    resetPosition() {
+        this.position = { x: 0.0, y: 0.0 }
+        this.prevPosition = this.position;
+        this.updateTransform();
     }
 
     onLoadListener(callback) {
@@ -29,39 +37,44 @@ export default class Video extends Widget {
     }
 
     pointerdownHandler(ev) {
-        evCache.push(ev);
+        this.evCache.push(ev);
     }
 
     pointermoveHandler(ev) {
-        for (var i = 0; i < evCache.length; i++) {
-            if (ev.pointerId == evCache[i].pointerId) {
-                evCache[i] = ev;
+        for (var i = 0; i < this.evCache.length; i++) {
+            if (ev.pointerId == this.evCache[i].pointerId) {
+                this.evCache[i] = ev;
                 break;
             }
         }
 
-        if (evCache.length == 2) {
-            var curDiff = Math.abs(evCache[0].clientX - evCache[1].clientX);
-            if (prevDiff > 0) {
-                let factor = 0.05 * (curDiff - prevDiff);
+        if (this.evCache.length === 1 && this.getScale() > 1) {
+            this.move(ev);
+        }
+
+        if (this.evCache.length === 2) {
+            var curDiff = Math.abs(this.evCache[0].clientX - this.evCache[1].clientX);
+            if (this.prevDiff > 0) {
+                let factor = 0.01 * (curDiff - this.prevDiff);
                 this.setScale(this.getScale() + factor);
             }
 
-            prevDiff = curDiff;
+            this.prevDiff = curDiff;
         }
     }
 
     pointerupHandler(ev) {
         this.removeEvent(ev);
-        if (evCache.length < 2) {
-            prevDiff = -1;
+        if (this.evCache.length < 2) {
+            this.prevDiff = -1;
         }
+        this.prevPosition = this.position;
     }
 
     removeEvent(ev) {
-        for (var i = 0; i < evCache.length; i++) {
-            if (evCache[i].pointerId == ev.pointerId) {
-                evCache.splice(i, 1);
+        for (var i = 0; i < this.evCache.length; i++) {
+            if (this.evCache[i].pointerId == ev.pointerId) {
+                this.evCache.splice(i, 1);
                 break;
             }
         }
@@ -77,11 +90,24 @@ export default class Video extends Widget {
         this.scale = scale;
         if (this.scale < 1) {
             this.scale = 1;
+            this.resetPosition();
         } else if (this.scale > 4) {
             this.scale = 4;
         }
 
-        this.selector.style.transform = `scale(${this.scale})`;
+        this.updateTransform();
+    }
+
+    move(ev) {
+        let diffX = (ev.clientX - this.selector.clientWidth / 2) - this.prevPosition.x;
+        let diffY = (ev.clientY - this.selector.clientHeight / 2) - this.prevPosition.y;
+        this.position.x += diffX;
+        this.position.y += diffY;
+        this.updateTransform();
+    }
+
+    updateTransform() {
+        this.selector.style.transform = `scale(${this.scale}) translate(${this.position.x}px, ${this.position.y}px)`;
     }
 
     getScale() {
