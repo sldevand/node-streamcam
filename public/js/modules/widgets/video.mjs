@@ -100,14 +100,14 @@ export default class Video extends Widget {
     move(ev) {
         let diffX = (ev.clientX - this.selector.clientWidth / 2) - this.prevPosition.x;
         let diffY = (ev.clientY - this.selector.clientHeight / 2) - this.prevPosition.y;
-        this.position.x += diffX * 0.5;
-        this.position.y += diffY * 0.5;
+        this.position.x += diffX;
+        this.position.y += diffY;
 
         this.updateTransform();
     }
 
     copyPrevPosition() {
-        Object.assign(this.prevPosition, this.position);
+        this.prevPosition = this.position;
     }
 
     updateTransform() {
