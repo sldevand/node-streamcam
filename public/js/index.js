@@ -8,13 +8,22 @@ import Video from './modules/widgets/video.mjs';
 var snackbar = new Snackbar('#snackbar');
 var loader = new Widget('.loading');
 var sensors = {
-    confortmetre : new Sensor('#extra-measures-container', 'confortmetre')
+    confortmetre: new Sensor('#extra-measures-container', 'confortmetre')
 };
 var cpu = new Cpu('#cpu-temp');
 var network = new Network();
+
 var src = config.stream.baseUrl + ':' + config.stream.port + '?action=stream';
 var video = new Video('#videoElement', src);
 video.onLoadListener(loader.hide);
+panzoom(video.getSelector(), {
+    maxZoom: 4,
+    minZoom: 1,
+    onTouch: e => { return false; },
+    onDoubleClick: e => { return false; },
+    zoomDoubleClickSpeed: 1,
+    transformOrigin: {x: 0.5, y: 0.5}
+});
 
 var startButton = document.getElementById('start');
 var stopButton = document.getElementById('stop');

@@ -14,4 +14,8 @@ export default class Widget {
     render() {
         throw new Error('You have to implement the render() method!');
     }
+
+    getSelector() {
+        return this.selector;
+    }
 }

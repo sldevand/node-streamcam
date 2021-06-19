@@ -1,6 +1,13 @@
 # Node StreamCam
 
-An express Nodejs server with UI to stream a webcam from a Raspberry Pi Zero W (or WH)
+An Nodejs server with UI to stream a webcam from a Raspberry Pi Zero W (or WH)
+
+## Used Technologies
+
+* [Nodejs](https://nodejs.org/en/)
+* [Express](https://expressjs.com)
+* [Socket.io](https://socket.io/)
+* The zoom and pinch feature is made with [anvaka/panzoom](https://github.com/anvaka/panzoom)
 
 ## Prerequisites
 

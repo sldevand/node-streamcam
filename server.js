@@ -82,6 +82,7 @@ function flushTimeout()
 //MIDDLEWARES
 app.use(express.static("public"));
 app.use(express.static("node_modules/socket.io/client-dist"));
+app.use(express.static("node_modules/panzoom/dist"));
 app.use(favicon(path.join(__dirname, "public", "favicon.ico")));
 
 //ROUTES
