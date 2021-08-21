@@ -1,29 +1,19 @@
 @import "./components/_snackbar.css";
 @import "./components/_loader.css";
 
-#container {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    margin: 5px;
-    background-color: rgb(24, 24, 24);
-    height: auto;
-}
-
-#videoElement {
-    color: whitesmoke;
-    object-fit: contain;
-    max-width: 100%;
-    max-height: 100%;
-    width: auto;
-    height: auto;
-    min-height: 100vh;
+body {
+    background-color: #747474;
+    margin: 0 auto;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
 }
 
 .button {
     border: none;
+    border-radius: 5px;
     color: black;
-    padding: 8px 22px;
+    padding: 12px 22px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
@@ -50,6 +40,51 @@
     max-height: max-content;
 }
 
+.measures {
+    color: rgb(255, 249, 249);
+    font-size: 1em;
+    top: 10px;
+    left: 10px;
+    z-index: 10;
+    max-height: 0px;
+}
+
+
+.icon {
+    vertical-align:middle;
+}
+
+.sensor-row {
+    padding: 0.2rem 0px;
+}
+
+.primary {
+    background-color: #63e9f8;
+}
+
+.secondary {
+    background-color: #f77f9d;
+}
+
+#container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin: 5px;
+    background-color: rgb(24, 24, 24);
+    height: auto;
+}
+
+#videoElement {
+    color: whitesmoke;
+    object-fit: contain;
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    min-height: 100vh;
+}
+
 #ir-buttons-container {
     left: 10px;
     bottom: 10px;
@@ -61,36 +96,11 @@
     top: 10px;
 }
 
-.measures {
-    color: rgb(255, 249, 249);
-    font-size: 1em;
-    top: 10px;
-    left: 10px;
-    z-index: 10;
-    max-height: 0px;
-}
-
 #extra-measures-container {
     top: 30px;
-}
-
-.green {
-    background-color: #00e676;
-}
-
-.red {
-    background-color: #ff1744;
 }
 
 #debug {
     color: whitesmoke;
     z-index: 100000;
-}
-
-body {
-    background-color: #747474;
-    margin: 0 auto;
-    padding: 0;
-    width: 100vw;
-    height: 100vh;
 }

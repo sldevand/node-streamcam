@@ -4,6 +4,7 @@ export default class Sensor extends Widget {
     constructor(querySelector, name) {
         super(querySelector);
         this.name = name;
+        this.icon = '<img class="icon" src="assets/thermometer.svg" alt="thermometer" />';
     }
 
     setData(data) {
@@ -22,6 +23,6 @@ export default class Sensor extends Widget {
 
     render() {
         let additionalValue = this.data.valeur2 ? `| ${this.data.valeur2 || '--'} %` : '';
-        this.selector.innerHTML = `<span>${this.name} = ${this.data.valeur1 || '--'} °C ${additionalValue}</span>`;
+        this.selector.innerHTML = `<span>${this.icon} ${this.data.valeur1 || '--'} °C ${additionalValue}</span>`;
     }
 }

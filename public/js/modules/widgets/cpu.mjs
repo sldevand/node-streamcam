@@ -1,6 +1,12 @@
 import Widget from "./widget.mjs";
 
 export default class Cpu extends Widget {
+    constructor(querySelector, name) {
+        super(querySelector);
+        this.name = name;
+        this.icon = '<img class="icon" src="assets/cpu.svg" alt="Cpu" />';
+    }
+
     setData(data) {
         // Reformat text from stdout
         if (data.includes("temp=")) {
@@ -12,6 +18,6 @@ export default class Cpu extends Widget {
     }
 
     render() {
-        this.selector.innerText = `Cpu = ${this.data} °C`;
+        this.selector.innerHTML = `${this.icon} ${this.data} °C`;
     }
 }
