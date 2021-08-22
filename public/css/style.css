@@ -2,7 +2,7 @@
 @import "./components/_loader.css";
 
 body {
-    background-color: #747474;
+    background-color: rgb(24, 24, 24);
     margin: 0 auto;
     padding: 0;
     width: 100vw;
