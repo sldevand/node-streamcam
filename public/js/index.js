@@ -15,7 +15,6 @@ var network = new Network();
 
 var src = config.stream.baseUrl + ':' + config.stream.port + '?action=stream';
 var video = new Video('#videoElement', src);
-video.onLoadListener(loader.hide);
 panzoom(video.getSelector(), {
     maxZoom: 4,
     minZoom: 1,
